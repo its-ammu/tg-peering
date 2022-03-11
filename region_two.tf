@@ -45,4 +45,4 @@ resource "aws_ec2_transit_gateway" "tg02" {
   description = "tg in region 2"
 }
 
-# TG peering accept
+# TG peering acceptor

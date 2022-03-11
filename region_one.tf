@@ -85,7 +85,7 @@ resource "aws_ec2_transit_gateway" "tg01" {
 }
 
 
-# TG Peering 
+# TG Peering requestor
 
 resource "aws_ec2_transit_gateway_peering_attachment" "example" {
   peer_account_id         = aws_ec2_transit_gateway.tg02.owner_id
