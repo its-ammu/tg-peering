@@ -1,0 +1,1 @@
+# Transit gateway peering with Terraform (Inter region)
