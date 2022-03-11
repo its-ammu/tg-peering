@@ -19,8 +19,6 @@
 
 ## Steps
 
-----
-
 
 - Create a VPC 1 in Ohio and VPC 2 in N.California
 - Create a private and pub subnet in VPC 1 and private subnet in vpc 2
@@ -28,3 +26,5 @@
 - Attach transit gateway peering connection and accept
 - Add a static route with opposite VPC (vpc in other region) cidr and peering type
 - Add opposite routes to corresponding subnet route tables
+
+----
