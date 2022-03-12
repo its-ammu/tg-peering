@@ -27,4 +27,4 @@
 - Add a static route with opposite VPC (vpc in other region) cidr and peering type
 - Add opposite routes to corresponding subnet route tables
 
-----
+
