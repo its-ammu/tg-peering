@@ -76,7 +76,7 @@ resource "aws_route_table" "privrt01" {
 }
 
 resource "aws_route_table_association" "privsub_ass01" {
-  subnet_id      = aws_subnet.privsub01.id
+  subnet_id      = aws_subnet.privatesub01.id
   route_table_id = aws_route_table.privrt01.id
 }
 
@@ -91,7 +91,7 @@ resource "aws_ec2_transit_gateway" "tg01" {
 
 resource "aws_ec2_transit_gateway_peering_attachment" "tg_peer" {
 
-  peer_region             = "us-west1"
+  peer_region             = "us-west-1"
   peer_transit_gateway_id = aws_ec2_transit_gateway.tg02.id
   transit_gateway_id      = aws_ec2_transit_gateway.tg01.id
 
@@ -111,15 +111,16 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "vpc_attach01" {
 # TG Peering route
 
 resource "aws_ec2_transit_gateway_route" "peer_route1" {
+  
   destination_cidr_block         = "28.0.0.0/16"
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.tg_peer.id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment.tg_peer.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway.tg01.association_default_route_table_id
 }
 
 # Subnet route
 
 resource "aws_route" "tg_route01" {
-  route_table_id         = aws_route_table.privrt01
+  route_table_id         = aws_route_table.privrt01.id
   destination_cidr_block = "28.0.0.0/16"
   transit_gateway_id     = aws_ec2_transit_gateway.tg01.id
 }
@@ -129,7 +130,7 @@ resource "aws_route" "tg_route01" {
 resource "aws_security_group" "sg01" {
   name        = "PING and SSH"
   description = "Security group for web server with ssh allowed"
-  vpc_id      = data.aws_vpc.vpc01.id
+  vpc_id      = aws_vpc.vpc01.id
   ingress {
     from_port   = 22
     to_port     = 22
@@ -156,18 +157,26 @@ resource "aws_security_group" "sg01" {
 
 resource "aws_instance" "private01" {
   ami             = "ami-0c293f3f676ec4f90"
-  subnet_id       = aws_subnet.privatesub01
-  security_groups = [aws_security_group.sg01]
+  subnet_id       = aws_subnet.privatesub01.id 
+  security_groups = [aws_security_group.sg01.id]
   instance_type   = "t2.micro"
   key_name        = "practice"
+  tags = {
+    Name = "Priv instance"
+  }
 }
 
 # Public EC2
 
 resource "aws_instance" "public01" {
   ami             = "ami-0c293f3f676ec4f90"
-  subnet_id       = aws_subnet.publicsub
-  security_groups = [aws_security_group.sg01]
+  associate_public_ip_address = true
+  subnet_id       = aws_subnet.publicsub.id
+  security_groups = [aws_security_group.sg01.id]
   instance_type   = "t2.micro"
   key_name        = "practice"
+
+  tags = {
+    Name = "Pub instance"
+  }
 }

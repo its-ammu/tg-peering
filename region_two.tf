@@ -3,7 +3,7 @@
 
 resource "aws_vpc" "vpc02" {
   provider         = aws.region2
-  cidr_block       = "27.0.0.0/16"
+  cidr_block       = "28.0.0.0/16"
   instance_tenancy = "default"
 
   tags = {
@@ -16,7 +16,7 @@ resource "aws_vpc" "vpc02" {
 resource "aws_subnet" "privatesub02" {
   provider   = aws.region2
   vpc_id     = aws_vpc.vpc02.id
-  cidr_block = "27.0.2.0/24"
+  cidr_block = "28.0.2.0/24"
 
   tags = {
     Name = "PrivSub02"
@@ -50,7 +50,7 @@ resource "aws_ec2_transit_gateway" "tg02" {
 
 # TG peering acceptor
 
-resource "aws_ec2_transit_gateway_peering_attachment_accepter" "example" {
+resource "aws_ec2_transit_gateway_peering_attachment_accepter" "tg_peer02" {
   provider                      = aws.region2
   transit_gateway_attachment_id = aws_ec2_transit_gateway_peering_attachment.tg_peer.id
 
@@ -73,14 +73,15 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "vpc_attach02" {
 resource "aws_ec2_transit_gateway_route" "peer_route2" {
   provider                       = aws.region2
   destination_cidr_block         = "27.0.0.0/16"
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.tg_peer.id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.tg_peer02.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway.tg02.association_default_route_table_id
 }
 
 # Subnet route
 
 resource "aws_route" "tg_route02" {
-  route_table_id         = aws_route_table.privrt02
+  provider = aws.region2
+  route_table_id         = aws_route_table.privrt02.id
   destination_cidr_block = "27.0.0.0/16"
   transit_gateway_id     = aws_ec2_transit_gateway.tg02.id
 }
@@ -88,9 +89,10 @@ resource "aws_route" "tg_route02" {
 # Ec2 security group
 
 resource "aws_security_group" "sg02" {
+  provider = aws.region2
   name        = "PING and SSH"
   description = "Security group for web server with ssh allowed"
-  vpc_id      = data.aws_vpc.vpc02.id
+  vpc_id      = aws_vpc.vpc02.id
   ingress {
     from_port   = 22
     to_port     = 22
@@ -116,10 +118,11 @@ resource "aws_security_group" "sg02" {
 # Private EC2
 
 resource "aws_instance" "private02" {
+  provider = aws.region2
   ami             = "ami-0a8a24772b8f01294"
-  subnet_id       = aws_subnet.privatesub02
-  security_groups = [aws_security_group.sg02]
+  subnet_id       = aws_subnet.privatesub02.id
+  security_groups = [aws_security_group.sg02.id]
   instance_type   = "t2.micro"
-  key_name        = "practicewest"
+  key_name        = "practice west"
 }
 
