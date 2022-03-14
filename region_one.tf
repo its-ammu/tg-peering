@@ -44,9 +44,9 @@ resource "aws_route_table" "pubrt" {
 }
 
 resource "aws_route" "ig_rt" {
-  route_table_id            = aws_route_table.pubrt.id
-  destination_cidr_block    = "0.0.0.0/0"
-  gateway_id = aws_internet_gateway.gw.id
+  route_table_id         = aws_route_table.pubrt.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.gw.id
 }
 
 resource "aws_route_table_association" "pubsub_ass" {
@@ -119,9 +119,9 @@ resource "aws_ec2_transit_gateway_route" "peer_route1" {
 # Subnet route
 
 resource "aws_route" "tg_route01" {
-  route_table_id            = aws_route_table.privrt01
-  destination_cidr_block    = "28.0.0.0/16"
-  transit_gateway_id = aws_ec2_transit_gateway.tg01.id
+  route_table_id         = aws_route_table.privrt01
+  destination_cidr_block = "28.0.0.0/16"
+  transit_gateway_id     = aws_ec2_transit_gateway.tg01.id
 }
 
 # Ec2 security group
